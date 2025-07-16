@@ -3,9 +3,11 @@ package com.ayush.restapi_withdatabase.Controller;
 import com.ayush.restapi_withdatabase.Entity.JournalEntity;
 import com.ayush.restapi_withdatabase.Service.JournalEntryService;
 import com.ayush.restapi_withdatabase.Service.JournalEntryServiceV2;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -25,24 +27,33 @@ public class JournalEntryController {
     }
 
     @PostMapping("/add")
-    public boolean addEntry(@RequestBody  JournalEntity entity){
+    public JournalEntity addEntry(@RequestBody  JournalEntity entity){
+        entity.setDate(LocalDate.now());
         JournalEntity entity1 = service2.addEntry(entity);
-        return true;
+        return entity1;
     }
 
     @PutMapping("/update/{id}")
-    public boolean updateEntryById(@PathVariable long id , @RequestBody JournalEntity entity){
-        JournalEntity entity1 =  service2.updateEntryById(id , entity);
-        return true;
+    public JournalEntity updateEntryById(@PathVariable ObjectId id , @RequestBody JournalEntity newEntity){
+
+        JournalEntity old = service2.getEntryById(id).orElse(null);
+
+        if(old!= null) {
+            old.setTitle(newEntity.getTitle() != null && !newEntity.getTitle().isEmpty() ? newEntity.getTitle() : old.getTitle());
+            old.setContent(newEntity.getContent() != null && !newEntity.getContent().isEmpty() ? newEntity.getContent() : old.getContent());
+        }
+
+        service2.updateEntryById(old);
+        return old;
     }
 
     @DeleteMapping("/delete/{id}")
-    public boolean deleteEntry(@PathVariable long id){
+    public boolean deleteEntry(@PathVariable ObjectId id){
         return service2.deleteEntry(id);
     }
 
     @GetMapping("/getEntry/{id}")
-    public JournalEntity getEntryById(@PathVariable long id){
-        return service2.getEntryById(id);
+    public JournalEntity getEntryById(@PathVariable ObjectId id){
+        return service2.getEntryById(id).orElse(null);
     }
 }

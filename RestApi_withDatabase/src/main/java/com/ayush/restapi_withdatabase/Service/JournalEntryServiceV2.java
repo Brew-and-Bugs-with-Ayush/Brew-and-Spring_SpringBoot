@@ -2,13 +2,11 @@ package com.ayush.restapi_withdatabase.Service;
 
 import com.ayush.restapi_withdatabase.Entity.JournalEntity;
 import com.ayush.restapi_withdatabase.Repo.JournalRepo;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class JournalEntryServiceV2 {
@@ -28,14 +26,11 @@ public class JournalEntryServiceV2 {
         return repo.save(entity);
     }
 
-    public JournalEntity updateEntryById(long id , JournalEntity entity) {
-
-       if (entity.getId() == id) return repo.save(entity);
-
-       else return new JournalEntity();
+    public void updateEntryById(JournalEntity entity) {
+        repo.save(entity);
     }
 
-    public boolean deleteEntry(long id) {
+    public boolean deleteEntry(ObjectId id) {
 
        if (repo.existsById(id)){
            repo.deleteById(id);
@@ -44,7 +39,7 @@ public class JournalEntryServiceV2 {
        else return false;
     }
 
-    public JournalEntity getEntryById(long id) {
-        return repo.findById(id).orElse(new JournalEntity());
+    public Optional<JournalEntity> getEntryById(ObjectId id) {
+        return repo.findById(id);
     }
 }
