@@ -22,6 +22,10 @@ public class JournalEntryServiceV2 {
         return repo.findAll();
     }
 
+    public Optional<JournalEntity> getEntryById(ObjectId id) {
+        return repo.findById(id);
+    }
+
     public JournalEntity addEntry(JournalEntity entity) {
         return repo.save(entity);
     }
@@ -30,16 +34,7 @@ public class JournalEntryServiceV2 {
         repo.save(entity);
     }
 
-    public boolean deleteEntry(ObjectId id) {
-
-       if (repo.existsById(id)){
-           repo.deleteById(id);
-           return true;
-       }
-       else return false;
-    }
-
-    public Optional<JournalEntity> getEntryById(ObjectId id) {
-        return repo.findById(id);
+    public void deleteEntry(ObjectId id) {
+        repo.deleteById(id);
     }
 }
