@@ -41,8 +41,8 @@ public class JournalEntryController {
     public ResponseEntity<JournalEntity> addEntry(@RequestBody  JournalEntity entity){
 
         try {
-            entity.setDate(LocalDate.now());
-            return new ResponseEntity<>(service2.addEntry(entity) , HttpStatus.CREATED);
+            service2.addEntry(entity);
+            return new ResponseEntity<>(entity , HttpStatus.CREATED);
         }
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

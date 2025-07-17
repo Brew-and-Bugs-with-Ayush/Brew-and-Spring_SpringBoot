@@ -2,12 +2,16 @@ package com.ayush.restapi_withdatabase.Service;
 
 import com.ayush.restapi_withdatabase.Entity.JournalEntity;
 import com.ayush.restapi_withdatabase.Repo.JournalRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class JournalEntryServiceV2 {
 
@@ -26,12 +30,23 @@ public class JournalEntryServiceV2 {
         return repo.findById(id);
     }
 
-    public JournalEntity addEntry(JournalEntity entity) {
-        return repo.save(entity);
+    public void addEntry(JournalEntity entity) {
+       try {
+           entity.setDate(LocalDate.from(LocalDateTime.now()));
+           repo.save(entity);
+       } catch (Exception e) {
+           log.error("Exception" , e);
+       }
+
     }
 
     public void updateEntryById(JournalEntity entity) {
-        repo.save(entity);
+       try {
+           entity.setDate(LocalDate.from(LocalDateTime.now()));
+           repo.save(entity);
+       } catch (Exception e) {
+           log.error("Exception" , e);
+       }
     }
 
     public void deleteEntry(ObjectId id) {
