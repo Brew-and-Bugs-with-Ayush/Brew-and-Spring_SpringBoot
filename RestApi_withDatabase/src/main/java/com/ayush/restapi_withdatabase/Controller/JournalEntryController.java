@@ -1,8 +1,10 @@
 package com.ayush.restapi_withdatabase.Controller;
 
 import com.ayush.restapi_withdatabase.Entity.JournalEntity;
+import com.ayush.restapi_withdatabase.Entity.User;
 import com.ayush.restapi_withdatabase.Service.JournalEntryService;
 import com.ayush.restapi_withdatabase.Service.JournalEntryServiceV2;
+import com.ayush.restapi_withdatabase.Service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,16 +20,26 @@ import java.util.Optional;
 public class JournalEntryController {
 
     private final JournalEntryServiceV2 service2;
+    private final UserService userService;
 
     @Autowired
-    public JournalEntryController(JournalEntryServiceV2 service2) {
+    public JournalEntryController(JournalEntryServiceV2 service2 , UserService userService) {
         this.service2 = service2;
+        this.userService = userService;
     }
 
-    @GetMapping("retrieve")
-    public ResponseEntity<List<JournalEntity>> getAll(){
-        return new ResponseEntity<>(service2.getAllEntries() , HttpStatus.OK);
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getAllEntriesOfUser(@PathVariable String username) {
+        User user = userService.findByUserName(username);
+
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        List<JournalEntity> all = user.getEntities();
+        return new ResponseEntity<>(all, HttpStatus.OK);
     }
+
 
     @GetMapping("/getEntry/{id}")
     public ResponseEntity<JournalEntity> getEntryById(@PathVariable ObjectId id){
@@ -37,11 +49,11 @@ public class JournalEntryController {
         return entity.map(journalEntity -> new ResponseEntity<>(entity.get(), HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<JournalEntity> addEntry(@RequestBody  JournalEntity entity){
+    @PostMapping("/add/{username}")
+    public ResponseEntity<JournalEntity> addEntry(@RequestBody  JournalEntity entity , @PathVariable String username){
 
         try {
-            service2.addEntry(entity);
+            service2.addEntry(entity , username);
             return new ResponseEntity<>(entity , HttpStatus.CREATED);
         }
         catch (Exception e) {
@@ -49,8 +61,12 @@ public class JournalEntryController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateEntryById(@PathVariable ObjectId id , @RequestBody JournalEntity newEntity){
+    @PutMapping("/update/{username}/{id}")
+    public ResponseEntity<String> updateEntryById(
+            @PathVariable ObjectId id ,
+            @PathVariable String username ,
+            @RequestBody JournalEntity newEntity
+    ){
 
         JournalEntity old = service2.getEntryById(id).orElse(null);
 
@@ -65,12 +81,12 @@ public class JournalEntryController {
 
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteEntry(@PathVariable ObjectId id){
+    @DeleteMapping("/delete/{username}/{id}")
+    public ResponseEntity<String> deleteEntry(@PathVariable ObjectId id ,  @PathVariable String username){
        Optional<JournalEntity> entity =  service2.getEntryById(id);
 
        if (entity.isPresent()) {
-           service2.deleteEntry(id);
+           service2.deleteEntry(id , username);
            return new ResponseEntity<>("Entry deleted" , HttpStatus.OK);
        }
        return new ResponseEntity<>("Entry not Found" , HttpStatus.NOT_FOUND);

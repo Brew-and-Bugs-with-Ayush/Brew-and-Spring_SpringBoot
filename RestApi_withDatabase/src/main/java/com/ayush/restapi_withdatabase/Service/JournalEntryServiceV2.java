@@ -1,13 +1,13 @@
 package com.ayush.restapi_withdatabase.Service;
 
 import com.ayush.restapi_withdatabase.Entity.JournalEntity;
+import com.ayush.restapi_withdatabase.Entity.User;
 import com.ayush.restapi_withdatabase.Repo.JournalRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -16,10 +16,12 @@ import java.util.*;
 public class JournalEntryServiceV2 {
 
    private final JournalRepo repo;
+   private final UserService userService;
 
    @Autowired
-    public JournalEntryServiceV2(JournalRepo repo) {
+    public JournalEntryServiceV2(JournalRepo repo , UserService userService) {
         this.repo = repo;
+        this.userService = userService;
     }
 
     public List<JournalEntity> getAllEntries(){
@@ -30,10 +32,17 @@ public class JournalEntryServiceV2 {
         return repo.findById(id);
     }
 
-    public void addEntry(JournalEntity entity) {
+    public void addEntry(JournalEntity entity, String username) {
        try {
-           entity.setDate(LocalDate.from(LocalDateTime.now()));
-           repo.save(entity);
+
+           User user = userService.findByUserName(username);
+
+           entity.setDate(LocalDateTime.now());
+
+           JournalEntity saved = repo.save(entity);
+           user.getEntities().add(saved);
+           userService.saveEntry(user);
+
        } catch (Exception e) {
            log.error("Exception" , e);
        }
@@ -42,14 +51,17 @@ public class JournalEntryServiceV2 {
 
     public void updateEntryById(JournalEntity entity) {
        try {
-           entity.setDate(LocalDate.from(LocalDateTime.now()));
+           entity.setDate(LocalDateTime.now());
            repo.save(entity);
        } catch (Exception e) {
            log.error("Exception" , e);
        }
     }
 
-    public void deleteEntry(ObjectId id) {
+    public void deleteEntry(ObjectId id, String username) {
+        User user = userService.findByUserName(username);
+        user.getEntities().removeIf(x -> x.getId().equals(id));
+        userService.saveEntry(user);
         repo.deleteById(id);
     }
 }
