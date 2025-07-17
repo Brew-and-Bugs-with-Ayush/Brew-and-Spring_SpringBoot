@@ -43,7 +43,6 @@ public class JournalEntryServiceV2 {
 
            JournalEntity saved = repo.save(entity);
            user.getEntities().add(saved);
-           user.setUsername(null);
            userService.saveEntry(user);
 
        } catch (Exception e) {
