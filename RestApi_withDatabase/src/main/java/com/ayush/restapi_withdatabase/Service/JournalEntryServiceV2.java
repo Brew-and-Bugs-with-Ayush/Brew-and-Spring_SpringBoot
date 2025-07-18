@@ -61,10 +61,22 @@ public class JournalEntryServiceV2 {
        }
     }
 
+    @Transactional
     public void deleteEntry(ObjectId id, String username) {
-        User user = userService.findByUserName(username);
-        user.getEntities().removeIf(x -> x.getId().equals(id));
-        userService.saveEntry(user);
-        repo.deleteById(id);
+       try {
+
+
+           User user = userService.findByUserName(username);
+           boolean removed = user.getEntities().removeIf(x -> x.getId().equals(id));
+
+           if (removed) {
+               userService.saveEntry(user);
+               repo.deleteById(id);
+           }
+       }
+       catch (Exception e){
+           log.error("e: ", e);
+           throw new RuntimeException("An error occurred while deleting the entries. " + e);
+       }
     }
 }

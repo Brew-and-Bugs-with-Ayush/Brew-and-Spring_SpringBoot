@@ -1,43 +1,36 @@
 package com.ayush.restapi_withdatabase.Controller;
 
 import com.ayush.restapi_withdatabase.Entity.User;
+import com.ayush.restapi_withdatabase.Repo.UserRepository;
 import com.ayush.restapi_withdatabase.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
     private final UserService service;
+    private final UserRepository userRepository;
+
 
     @Autowired
-    public UserController(UserService service) {
+    public UserController(UserService service, UserRepository userRepository) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
-        return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
-    }
+    @PutMapping("/update")
+    public ResponseEntity<String> updateUsers(@RequestBody User user){
 
-    @PostMapping("/add")
-    public ResponseEntity<User> addUsers(@RequestBody User user){
-        try {
-            service.saveEntry(user);
-            return new ResponseEntity<>(user , HttpStatus.CREATED);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
 
-    @PutMapping("/update/{username}")
-    public ResponseEntity<String> updateUsers(@RequestBody User user  , @PathVariable String username){
         try{
             User user1 = service.findByUserName(username);
             if (user1 == null) {
@@ -52,6 +45,14 @@ public class UserController {
         catch (Exception e){
             return new ResponseEntity<>("User not found" , HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<?> deleteUserById(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userRepository.deleteByUsername(authentication.getName());
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
