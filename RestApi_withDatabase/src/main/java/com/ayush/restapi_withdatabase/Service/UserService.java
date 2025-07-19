@@ -34,6 +34,12 @@ public class UserService {
         repository.save(user);
     }
 
+    public void saveAdmin(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoll(Arrays.asList("USER" , "ADMIN"));
+        repository.save(user);
+    }
+
     public List<User> getAll(){
         return repository.findAll();
     }
@@ -49,4 +55,5 @@ public class UserService {
     public User findByUserName(String username) {
         return repository.findByUsername(username);
     }
+
 }

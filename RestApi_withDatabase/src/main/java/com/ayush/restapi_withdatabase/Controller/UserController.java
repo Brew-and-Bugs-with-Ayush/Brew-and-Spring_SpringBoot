@@ -26,20 +26,20 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> updateUsers(@RequestBody User user){
+    public ResponseEntity<?> updateUsers(@RequestBody User user){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         try{
-            User user1 = service.findByUserName(username);
-            if (user1 == null) {
+            User userInDb = service.findByUserName(username);
+            if (userInDb == null) {
                 return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
             }
-            user1.setUsername(user1.getUsername());
-            user1.setPassword(user1.getPassword());
+            userInDb.setUsername(user.getUsername());
+            userInDb.setPassword(user.getPassword());
 
-            service.saveEntry(user1);
+            service.saveNewUser(userInDb);
             return new ResponseEntity<>("Updated", HttpStatus.OK);
         }
         catch (Exception e){
