@@ -3,6 +3,8 @@ package com.ayush.restapi_withdatabase.Service;
 import com.ayush.restapi_withdatabase.Entity.User;
 import com.ayush.restapi_withdatabase.Repo.UserRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +19,8 @@ public class UserService {
 
     private final UserRepository repository;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class); // if we want to use logger like this, we have to implement it
+
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
@@ -29,9 +33,18 @@ public class UserService {
     }
 
     public void saveNewUser(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoll(Arrays.asList("USER"));
-        repository.save(user);
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRoll(List.of("USER"));
+            repository.save(user);
+        }
+        catch (Exception e) {
+            logger.error("Logging practice{}", String.valueOf(e)); // {} - means PlaceHolder
+//            logger.info("Logging practice");
+//            logger.warn("Logging practice");
+//            logger.debug("Logging practice");
+//            logger.trace("Logging practice");
+        }
     }
 
     public void saveAdmin(User user){
