@@ -33,3 +33,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore future changes to this file
+/src/main/resources/application-prod.properties
