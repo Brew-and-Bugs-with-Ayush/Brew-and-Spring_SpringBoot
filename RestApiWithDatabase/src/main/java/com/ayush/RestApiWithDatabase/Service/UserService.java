@@ -35,7 +35,7 @@ public class UserService {
     public void saveNewUser(User user){
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoll(List.of("USER"));
+            user.setRoles(List.of("USER"));
             repository.save(user);
         }
         catch (Exception e) {
@@ -49,7 +49,7 @@ public class UserService {
 
     public void saveAdmin(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoll(Arrays.asList("USER" , "ADMIN"));
+        user.setRoles(Arrays.asList("USER" , "ADMIN"));
         repository.save(user);
     }
 

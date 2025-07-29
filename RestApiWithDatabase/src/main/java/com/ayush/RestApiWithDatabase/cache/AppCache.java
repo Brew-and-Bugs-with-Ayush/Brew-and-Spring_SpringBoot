@@ -13,12 +13,13 @@ import java.util.Map;
 @Component
 public class AppCache {
 
-    public enum key {
+    public enum Keys {
         WEATHER_API
     }
 
     private final ConfigJournalAppRepository configJournalAppRepository;
 
+    private Map<String , String> appCache;
 
     @Autowired
     public AppCache(ConfigJournalAppRepository configJournalAppRepository) {
@@ -27,11 +28,15 @@ public class AppCache {
 
     @PostConstruct
     public void init(){
-        Map<String , String> appCache = new HashMap<>();
+        appCache = new HashMap<>();
         List<ConfigJournalAppEntity> all = configJournalAppRepository.findAll();
 
         for (ConfigJournalAppEntity configJournalAppEntity : all){
             appCache.put(configJournalAppEntity.getKey() , configJournalAppEntity.getValue());
         }
+    }
+
+    public String getValue(Keys key){
+        return appCache.get(key.name());
     }
 }
