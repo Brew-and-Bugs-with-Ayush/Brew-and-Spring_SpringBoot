@@ -4,6 +4,7 @@ import com.ayush.RestApiWithDatabase.Entity.User;
 import com.ayush.RestApiWithDatabase.Repo.UserRepository;
 import com.ayush.RestApiWithDatabase.Service.UserService;
 import com.ayush.RestApiWithDatabase.Service.WeatherService;
+import com.ayush.RestApiWithDatabase.api.response.WeatherResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +59,15 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping
+    public ResponseEntity<?> greeting() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
+        String greeting = "";
+        if (weatherResponse != null) {
+            greeting = ", Weather feels like " + weatherResponse.getCurrent().getFeelsLike();
+        }
+        return new ResponseEntity<>("Hi " + authentication.getName() + greeting, HttpStatus.OK);
+    }
 
 }
