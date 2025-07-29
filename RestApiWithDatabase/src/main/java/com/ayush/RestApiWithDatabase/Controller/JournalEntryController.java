@@ -99,7 +99,7 @@ public class JournalEntryController {
 
             if (entity.isPresent()){
                JournalEntity old =  entity.get();
-                old.setTitle(newEntity.getTitle() != null && !newEntity.getTitle().isEmpty() ? newEntity.getTitle() : old.getTitle());
+                old.setTitle(!newEntity.getTitle().isEmpty() ? newEntity.getTitle() : old.getTitle());
                 old.setContent(newEntity.getContent() != null && !newEntity.getContent().isEmpty() ? newEntity.getContent() : old.getContent());
                 service2.updateEntryById(old);
                 return new ResponseEntity<>(entity.get() , HttpStatus.OK);

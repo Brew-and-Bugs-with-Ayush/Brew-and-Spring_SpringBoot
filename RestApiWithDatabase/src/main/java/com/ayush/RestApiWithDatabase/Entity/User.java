@@ -1,7 +1,6 @@
 package com.ayush.RestApiWithDatabase.Entity;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,6 +14,9 @@ import java.util.List;
 
 @Data
 @Document(collection = "users")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -28,9 +30,8 @@ public class User {
 
     @NonNull
     private String password;
-    private List<String> roll;
 
     @DBRef
     private List<JournalEntity> entities = new ArrayList<>();
-
+    private List<String> roles;
 }

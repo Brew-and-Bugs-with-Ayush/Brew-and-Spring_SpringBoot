@@ -3,6 +3,7 @@ package com.ayush.RestApiWithDatabase.Controller;
 import com.ayush.RestApiWithDatabase.Entity.User;
 import com.ayush.RestApiWithDatabase.Repo.UserRepository;
 import com.ayush.RestApiWithDatabase.Service.UserService;
+import com.ayush.RestApiWithDatabase.Service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,14 @@ public class UserController {
 
     private final UserService service;
     private final UserRepository userRepository;
+    private final WeatherService weatherService;
 
 
     @Autowired
-    public UserController(UserService service, UserRepository userRepository) {
+    public UserController(UserService service, UserRepository userRepository, WeatherService weatherService) {
         this.service = service;
         this.userRepository = userRepository;
+        this.weatherService = weatherService;
     }
 
     @PutMapping("/update")
